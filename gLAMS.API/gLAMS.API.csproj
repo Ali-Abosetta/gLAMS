@@ -10,4 +10,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\gLAMS.Application\gLAMS.Application.csproj" />
+    <ProjectReference Include="..\gLAMS.Infrastructure\gLAMS.Infrastructure.csproj" />
+    <ProjectReference Include="..\gLAMS.Shared\gLAMS.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

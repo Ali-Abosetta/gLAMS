@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gLAMS.ConsoleSandbox", "gLA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gLAMS.WPF", "gLAMS.WPF\gLAMS.WPF.csproj", "{0C176FB1-68E3-4EB6-8BF5-993007C1910D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gLAMS.API", "gLAMS.API\gLAMS.API.csproj", "{F5857615-8CBB-4973-99AA-951B82A0A310}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{0C176FB1-68E3-4EB6-8BF5-993007C1910D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C176FB1-68E3-4EB6-8BF5-993007C1910D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C176FB1-68E3-4EB6-8BF5-993007C1910D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5857615-8CBB-4973-99AA-951B82A0A310}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5857615-8CBB-4973-99AA-951B82A0A310}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5857615-8CBB-4973-99AA-951B82A0A310}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5857615-8CBB-4973-99AA-951B82A0A310}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
