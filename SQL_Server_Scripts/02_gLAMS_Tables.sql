@@ -54,7 +54,7 @@ CREATE TABLE [Content].[Questions]
 		UpdatedAt DATETIME2 NOT NULL DEFAULT(GETUTCDATE()),
 		IsDeleted BIT NOT NULL DEFAULT(0)
 
-		CONSTRAINT CHK_QuestionType CHECK (QuestionType IN (1, 2, 3))
+		CONSTRAINT CHK_QuestionType CHECK (QuestionType IN (1, 2))
 	)
 GO
 
