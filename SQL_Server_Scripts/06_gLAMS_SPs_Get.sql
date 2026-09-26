@@ -41,6 +41,68 @@ BEGIN
 END
 GO
 
+-- get root folders
+CREATE PROCEDURE [Structure].[usp_GetRootFolders]
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT 
+		[FolderID],
+		[ParentID],
+		[Name],
+		[CreatedAt],
+		[UpdatedAt]
+		FROM [Structure].[Folders]
+	WHERE	
+		[ParentID] IS NULL
+		AND [IsDeleted] = 0
+END
+GO
+
+-- get sub folders by parent Id
+CREATE PROCEDURE [Structure].[usp_GetFoldersByParentId]
+	@ParentId UNIQUEIDENTIFIER
+
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT 
+		[FolderID],
+		[ParentID],
+		[Name],
+		[CreatedAt],
+		[UpdatedAt]
+		FROM [Structure].[Folders]
+	WHERE	
+		[ParentID] = @ParentId
+		AND [IsDeleted] = 0
+END
+GO
+
+-- get folder by id
+CREATE PROCEDURE [Structure].[usp_GetFolderById]
+
+	@FolderID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT 
+		[FolderID],
+		[ParentID],
+		[Name],
+		[CreatedAt],
+		[UpdatedAt]
+		FROM [Structure].[Folders]
+	WHERE	
+		[FolderID] = @FolderID
+		AND [IsDeleted] = 0
+	
+END
+GO
+
 -- get courses
 CREATE PROCEDURE [Structure].[usp_GetCourses]
 	@LastSyncTime DATETIME2 = NULL

@@ -24,6 +24,8 @@ BEGIN
 		@ParentID,
 		@Name
 	)
+
+	EXEC [Structure].[usp_GetFolderById] @FolderID = @FolderID;
 END
 GO
 

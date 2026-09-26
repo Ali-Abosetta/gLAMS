@@ -1,4 +1,9 @@
+using gLAMS.Application.Interfaces.Logging;
 using gLAMS.Infrastructure.Logging;
+using gLAMS.Application.Interfaces.Factories;
+using gLAMS.Infrastructure.Factories;
+using gLAMS.Application.Interfaces.Repositories;
+using gLAMS.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,7 +14,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// I did not know how to implement my logger here....
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'DefaultConnection' not found in appsettings.json.");
+}
+
+builder.Services.AddSingleton<IAppLogger, WindowsEventLogger>();
+
+builder.Services.AddSingleton<ISqlConnectionFactory>(
+    provider => new SqlConnectionFactory(connectionString!)
+);
+
+builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+
+
 
 var app = builder.Build();
 
