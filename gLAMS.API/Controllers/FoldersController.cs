@@ -13,6 +13,9 @@ namespace gLAMS.API.Controllers
 {
     [Route("api/Folders")]
     [ApiController]
+    /// <summary>
+    /// Controller responsible for managing Folder hierarchies.
+    /// </summary>
     public class FoldersController : ControllerBase
     {
         private readonly IFolderRepository _folderRepository;
@@ -25,6 +28,9 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Retrieves all active folders in the system.
+        /// </summary>
         public async Task<IActionResult> GetAllFolders()
         {
             Result<IEnumerable<Folder>> result = await _folderRepository.GetAllAsync();
@@ -50,6 +56,9 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Retrieves all root folders (folders without a parent).
+        /// </summary>
         public async Task<IActionResult> GetRootFolders()
         {
             Result<IEnumerable<Folder>> result = await _folderRepository.GetRootFoldersAsync();
@@ -75,6 +84,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FolderResponseDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Retrieves a specific folder by its unique identifier.
+        /// </summary>
+        /// <param name="id">The GUID of the folder.</param>
         public async Task<IActionResult> GetFolderById([FromRoute] Guid id)
         {
             Result<Folder> result = await _folderRepository.GetByIdAsync(id);
@@ -97,6 +110,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Retrieves all direct sub-folders for a given parent folder.
+        /// </summary>
+        /// <param name="parentId">The GUID of the parent folder.</param>
         public async Task<IActionResult> GetSubFoldersByParentId([FromRoute] Guid parentId)
         {
             Result<IEnumerable<Folder>> result = await _folderRepository.GetSubfoldersByParentIdAsync(parentId);
@@ -122,6 +139,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(FolderResponseDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Creates a new folder.
+        /// </summary>
+        /// <param name="newFolderDto">The folder creation payload.</param>
         public async Task<IActionResult> AddFolder([FromBody] FolderCreateDto newFolderDto)
         {
             if (newFolderDto == null || newFolderDto.Id == Guid.Empty)
@@ -156,6 +177,11 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Updates an existing folder's details.
+        /// </summary>
+        /// <param name="id">The GUID of the folder to update.</param>
+        /// <param name="folderDto">The updated folder data.</param>
         public async Task<IActionResult> UpdateFolder([FromRoute] Guid id, [FromBody] FolderUpdateDto folderDto)
         {
             if (folderDto == null || id == Guid.Empty)
@@ -186,6 +212,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Soft deletes a folder by its unique identifier.
+        /// </summary>
+        /// <param name="id">The GUID of the folder to delete.</param>
         public async Task<IActionResult> DeleteFolder([FromRoute] Guid id)
         {
             Result<bool> result = await _folderRepository.DeleteAsync(id);

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +7,9 @@ using gLAMS.Domain.Entities;
 
 namespace gLAMS.Application.DTOs.Folders
 {
+    /// <summary>
+    /// Data Transfer Object representing the outgoing response payload for a Folder.
+    /// </summary>
     public class FolderResponseDto
     {
         public Guid Id { get; set; }
