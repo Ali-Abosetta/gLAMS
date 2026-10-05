@@ -49,6 +49,7 @@ BEGIN
 		@FolderID,
 		@Name
 	)
+	EXEC [Structure].[usp_GetCourseById] @CourseID = @CourseID;
 END
 GO
 
@@ -82,6 +83,7 @@ BEGIN
 		@Title,
 		@NextSort
 	)
+	EXEC [Structure].[usp_GetLesson] @LessonID = @LessonID;
 END
 GO
 

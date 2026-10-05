@@ -21,6 +21,11 @@ namespace gLAMS.Infrastructure.Repositories
     /// </summary>
     public class FolderRepository : BaseRepository, IFolderRepository
     {
+        public FolderRepository(ISqlConnectionFactory connectionFactory, IAppLogger logger)
+            : base(connectionFactory, logger)
+        {
+
+        }
         private Folder MapReaderToFolder(SqlDataReader reader)
         {
             return new Folder
@@ -36,29 +41,19 @@ namespace gLAMS.Infrastructure.Repositories
             };
         }
 
-        public FolderRepository(ISqlConnectionFactory connectionFactory, IAppLogger logger)
-            : base(connectionFactory, logger)
-        {
-
-        }
 
         private async Task<Result<IEnumerable<Folder>>> GetRootFoldersInternalAsync()
         {
             List<Folder> folders = new List<Folder>();
 
-                using SqlCommand command = new SqlCommand("[Structure].[usp_GetRootFolders]");
-                command.CommandType = CommandType.StoredProcedure;
+            using SqlCommand command = new SqlCommand("[Structure].[usp_GetRootFolders]");
+            command.CommandType = CommandType.StoredProcedure;
 
-                folders = await FetchListAsync(command, MapReaderToFolder);
-
-                if (folders == null)
-                {
-                    return Result<IEnumerable<Folder>>.Failure("No root folders was found");
-                }
+            folders = await FetchListAsync(command, MapReaderToFolder);
 
             return Result<IEnumerable<Folder>>.Success(folders);
         }
-        
+
         public async Task<Result<IEnumerable<Folder>>> GetRootFoldersAsync()
         {
             return await ExecuteSafeAsync(() => GetRootFoldersInternalAsync());
@@ -68,15 +63,10 @@ namespace gLAMS.Infrastructure.Repositories
         {
             List<Folder> folders = new List<Folder>();
 
-                using SqlCommand command = new SqlCommand("[Structure].[usp_GetFolders]");
-                command.CommandType = CommandType.StoredProcedure;
+            using SqlCommand command = new SqlCommand("[Structure].[usp_GetFolders]");
+            command.CommandType = CommandType.StoredProcedure;
 
-                folders = await FetchListAsync(command, MapReaderToFolder);
-
-                if (folders == null)
-                {
-                    return Result<IEnumerable<Folder>>.Failure("No folders was found");
-                }
+            folders = await FetchListAsync(command, MapReaderToFolder);
 
             return Result<IEnumerable<Folder>>.Success(folders);
         }
@@ -87,21 +77,13 @@ namespace gLAMS.Infrastructure.Repositories
 
         private async Task<Result<Folder>> GetFolderByIdInternalAsync(Guid id)
         {
-            Folder? folder = new Folder();
 
-                using (SqlCommand command = new SqlCommand("[Structure].[usp_GetFolderById]"))
-                {
-                    command.CommandType = CommandType.StoredProcedure;
-                    command.Parameters.AddWithValue("@FolderID", id);
+            using SqlCommand command = new SqlCommand("[Structure].[usp_GetFolderById]");
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@FolderID", id);
 
-                    List<Folder> folders = await FetchListAsync<Folder>(command, MapReaderToFolder);
-                    folder = folders.FirstOrDefault();
-
-                    if (folder == null)
-                    {
-                        return Result<Folder>.Failure($"No folder was found with id {id}");
-                    }
-                }
+            List<Folder> folders = await FetchListAsync<Folder>(command, MapReaderToFolder);
+            Folder? folder = folders.FirstOrDefault();
 
             return Result<Folder>.Success(folder);
         }
@@ -113,18 +95,12 @@ namespace gLAMS.Infrastructure.Repositories
 
         private async Task<Result<IEnumerable<Folder>>> GetSubFoldersByParentIdInternalAsync(Guid parentId)
         {
-            List<Folder> folders = new List<Folder>();
 
-                using SqlCommand command = new SqlCommand("[Structure].[usp_GetFoldersByParentId]");
-                command.CommandType = CommandType.StoredProcedure;
-                command.Parameters.AddWithValue("@ParentID", parentId);
+            using SqlCommand command = new SqlCommand("[Structure].[usp_GetFoldersByParentId]");
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@ParentID", parentId);
 
-                folders = await FetchListAsync<Folder>(command, MapReaderToFolder);
-
-                if (folders == null)
-                {
-                    return Result<IEnumerable<Folder>>.Failure($"No sub folders for the parent with id {parentId}");
-                }
+            List<Folder> folders = await FetchListAsync<Folder>(command, MapReaderToFolder);
 
             return Result<IEnumerable<Folder>>.Success(folders);
         }
@@ -145,11 +121,6 @@ namespace gLAMS.Infrastructure.Repositories
 
             List<Folder> folders = await FetchListAsync<Folder>(command, MapReaderToFolder);
             Folder? newFolder = folders.FirstOrDefault();
-
-            if (newFolder == null)
-            {
-                return Result<Folder>.Failure("Fail to add the folder.");
-            }
 
             return Result<Folder>.Success(newFolder);
         }
@@ -172,14 +143,15 @@ namespace gLAMS.Infrastructure.Repositories
             rowsAffectedParam.Direction = ParameterDirection.Output;
             command.Parameters.Add(rowsAffectedParam);
 
-            await ExecuteCommandAsync(command);
+            List<Folder> folders = await FetchListAsync<Folder>(command, MapReaderToFolder);
+            Folder? updatedFolder = folders.FirstOrDefault();
 
             int rowsAffected = (int)rowsAffectedParam.Value;
-            if (rowsAffected == 0)
+            if (rowsAffected == 0 || updatedFolder == null)
             {
-                return Result<Folder>.Failure($"Failed to update folder. ID {folder.Id} not found or no changes made.");
+                return Result<Folder>.Success(null);
             }
-            return Result<Folder>.Success(folder);
+            return Result<Folder>.Success(updatedFolder);
         }
 
         public async Task<Result<Folder>> UpdateAsync(Folder folder)
@@ -191,7 +163,7 @@ namespace gLAMS.Infrastructure.Repositories
         {
             using SqlCommand command = new SqlCommand("[Structure].[usp_DeleteFolder]");
             command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("FolderID", id);
+            command.Parameters.AddWithValue("@FolderID", id);
 
             SqlParameter rowsAffectedParam = new("@RowsAffected", SqlDbType.Int);
             rowsAffectedParam.Direction = ParameterDirection.Output;
@@ -202,7 +174,7 @@ namespace gLAMS.Infrastructure.Repositories
             int rowsAffected = (int) rowsAffectedParam.Value;
             if (rowsAffected == 0)
             {
-                return Result<bool>.Failure($"Failed to delete folder. ID {id} not found or no changes made.");
+                return Result<bool>.Success(false);
             }
             return Result<bool>.Success(true);
         }

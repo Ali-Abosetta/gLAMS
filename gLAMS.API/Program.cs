@@ -27,6 +27,9 @@ builder.Services.AddSingleton<ISqlConnectionFactory>(
 );
 
 builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+builder.Services.AddScoped<ICourseRepository, CourseRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IFlashCardRepository, FlashCardRepository>();
 
 
 

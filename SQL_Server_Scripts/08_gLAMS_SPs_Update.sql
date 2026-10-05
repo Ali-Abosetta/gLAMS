@@ -15,8 +15,10 @@ BEGIN
 			[ParentID] = @ParentID,
 			[Name] = @Name
 	WHERE	[FolderID] = @FolderID
-	
+		AND [IsDeleted] = 0
+
 	SET @RowsAffected = @@ROWCOUNT
+	EXEC [Structure].[usp_GetFolderById] @FolderID = @FolderID;
 END
 GO
 

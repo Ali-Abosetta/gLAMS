@@ -39,7 +39,7 @@ namespace gLAMS.Shared.Responses
         /// </summary>
         /// <param name="data">The data to return.</param>
         /// <returns>A successful <see cref="Result{T}"/>.</returns>
-        public static Result<T> Success(T data)
+        public static Result<T> Success(T? data)
         {
             return new Result<T>(true, null, data);
         }

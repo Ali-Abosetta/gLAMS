@@ -1,3 +1,6 @@
+USE [gLAMS]
+GO
+
 CREATE VIEW [Content].[vw_ActiveMcqQuestions]
 AS
 SELECT 
