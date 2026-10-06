@@ -1,4 +1,4 @@
-﻿using gLAMS.Application.DTOs.Courses;
+using gLAMS.Application.DTOs.Courses;
 using gLAMS.Application.DTOs.Folders;
 using gLAMS.Application.Interfaces.Repositories;
 using gLAMS.Domain.Entities;
@@ -12,6 +12,9 @@ namespace gLAMS.API.Controllers
 {
     [Route("api/Courses")]
     [ApiController]
+    /// <summary>
+    /// Controller responsible for managing Courses.
+    /// </summary>
     public class CoursesController : ControllerBase
     {
         private readonly ICourseRepository _courseRepository;
@@ -24,6 +27,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<Course>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        /// <summary>
+        /// Retrieves all courses associated with a specific folder.
+        /// </summary>
+        /// <param name="folderId">The GUID of the parent folder.</param>
         public async Task<IActionResult> GetCoursesByFolderId([FromRoute] Guid folderId)
         {
             Result<IEnumerable<Course>> result = await _courseRepository.GetCoursesByFolderIdAsync(folderId);
@@ -49,6 +56,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CourseResponseDto>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        /// <summary>
+        /// Searches for active courses by name using relevance sorting.
+        /// </summary>
+        /// <param name="Name">The search keyword.</param>
         public async Task<IActionResult> SearchCourseByName([FromRoute] string Name)
         {
             Result<IEnumerable<Course>> result = await _courseRepository.SearchCoursesByNameAsync(Name);
@@ -74,6 +85,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(CourseResponseDto))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        /// <summary>
+        /// Retrieves a specific course by its unique identifier.
+        /// </summary>
+        /// <param name="id">The GUID of the course.</param>
         public async Task<IActionResult> GetCourseById([FromRoute] Guid id)
         {
             Result<Course> result = await _courseRepository.GetByIdAsync(id);
@@ -97,6 +112,9 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<CourseResponseDto>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        /// <summary>
+        /// Retrieves all active courses in the system.
+        /// </summary>
         public async Task<IActionResult> GetAllCourses()
         {
             Result<IEnumerable<Course>> result = await _courseRepository.GetAllAsync();
@@ -121,6 +139,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(CourseResponseDto))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        /// <summary>
+        /// Creates a new course.
+        /// </summary>
+        /// <param name="newCourseDto">The course creation payload.</param>
         public async Task<IActionResult> AddCourse([FromBody] CourseCreateDto newCourseDto)
         {
 
@@ -162,6 +184,11 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
 
+        /// <summary>
+        /// Updates an existing course's details.
+        /// </summary>
+        /// <param name="id">The GUID of the course to update.</param>
+        /// <param name="courseDto">The updated course data.</param>
         public async Task<IActionResult> UpdateCourse([FromRoute] Guid id, [FromBody] CourseUpdateDto courseDto)
         {
             if (courseDto == null)
@@ -196,6 +223,10 @@ namespace gLAMS.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        /// <summary>
+        /// Soft deletes a course by its unique identifier.
+        /// </summary>
+        /// <param name="id">The GUID of the course to delete.</param>
         public async Task<IActionResult> DeleteCourse([FromRoute] Guid id)
         {
 

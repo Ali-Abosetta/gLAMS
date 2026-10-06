@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +7,9 @@ using gLAMS.Domain.Entities;
 
 namespace gLAMS.Application.DTOs.Courses
 {
+    /// <summary>
+    /// Data Transfer Object representing the incoming payload to create a new Course.
+    /// </summary>
     public class CourseCreateDto : BaseCreateDto
     {
 
