@@ -145,9 +145,13 @@ namespace gLAMS.API.Controllers
         /// <param name="newFolderDto">The folder creation payload.</param>
         public async Task<IActionResult> AddFolder([FromBody] FolderCreateDto newFolderDto)
         {
-            if (newFolderDto == null || newFolderDto.Id == Guid.Empty)
+            if (newFolderDto == null)
             {
-                return BadRequest("Invalid payload.");
+                return BadRequest("Invalid payload: The sent folder is null.");
+            }
+            else if (newFolderDto.Id == Guid.Empty)
+            {
+                return BadRequest("Invalid payload: cannot have a null id.");
             }
 
             Folder newFolder = newFolderDto.ToEntity();
@@ -184,11 +188,14 @@ namespace gLAMS.API.Controllers
         /// <param name="folderDto">The updated folder data.</param>
         public async Task<IActionResult> UpdateFolder([FromRoute] Guid id, [FromBody] FolderUpdateDto folderDto)
         {
-            if (folderDto == null || id == Guid.Empty)
+            if (folderDto == null)
             {
-                return BadRequest("Invalid payload.");
+                return BadRequest("Invalid payload: the sent folder is null");
             }
-
+            else if (id == Guid.Empty)
+            {
+                return BadRequest("Invalid payload: The folder id is empty");
+            }
             Folder folder = folderDto.ToEntity();
             folder.Id = id;
 

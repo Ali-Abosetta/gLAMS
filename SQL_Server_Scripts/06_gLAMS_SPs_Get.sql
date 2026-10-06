@@ -225,7 +225,6 @@ GO
 
 -- get (search) courses by name
 CREATE PROCEDURE [Structure].[usp_SearchCoursesByName]
-
 	@Name NVARCHAR(150)
 AS
 BEGIN
@@ -239,8 +238,15 @@ BEGIN
 		[UpdatedAt],
 		[IsDeleted]
 	FROM [Structure].[Courses]
-	WHERE	[Name] LIKE @Name
+	WHERE	[Name] LIKE '%' + @Name + '%'
 		AND [IsDeleted] = 0
+	ORDER BY 	
+		CASE 
+			WHEN [Name] = @Name THEN 1           --  Exact Match
+			WHEN [Name] LIKE @Name + '%' THEN 2  --  Starts With
+			ELSE 3                               --  Contains it somewhere inside
+		END ASC,
+		[Name] ASC; 
 END
 GO
 

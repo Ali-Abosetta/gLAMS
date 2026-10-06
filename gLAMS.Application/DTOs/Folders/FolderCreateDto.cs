@@ -10,9 +10,8 @@ namespace gLAMS.Application.DTOs.Folders
     /// <summary>
     /// Data Transfer Object representing the incoming payload to create a new Folder.
     /// </summary>
-    public class FolderCreateDto
+    public class FolderCreateDto : BaseCreateDto
     {
-        public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
         public string Name { get; set; } = string.Empty;
 

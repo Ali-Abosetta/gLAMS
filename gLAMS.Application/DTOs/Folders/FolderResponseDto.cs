@@ -10,14 +10,10 @@ namespace gLAMS.Application.DTOs.Folders
     /// <summary>
     /// Data Transfer Object representing the outgoing response payload for a Folder.
     /// </summary>
-    public class FolderResponseDto
+    public class FolderResponseDto : BaseResponseDto
     {
-        public Guid Id { get; set; }
         public Guid? ParentId { get; set; }
         public string Name { get; set; } = string.Empty;
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public bool IsDeleted { get; set; }
 
         public FolderResponseDto() { }
         public FolderResponseDto(Folder folder) 

@@ -61,12 +61,11 @@ namespace gLAMS.Infrastructure.Repositories
 
         private async Task<Result<IEnumerable<Folder>>> GetAllFoldersInternalAsync()
         {
-            List<Folder> folders = new List<Folder>();
 
             using SqlCommand command = new SqlCommand("[Structure].[usp_GetFolders]");
             command.CommandType = CommandType.StoredProcedure;
 
-            folders = await FetchListAsync(command, MapReaderToFolder);
+            List<Folder> folders = await FetchListAsync(command, MapReaderToFolder);
 
             return Result<IEnumerable<Folder>>.Success(folders);
         }

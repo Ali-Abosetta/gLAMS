@@ -35,8 +35,10 @@ BEGIN
 			[FolderID] = @FolderID,
 			[Name] = @Name
 	WHERE	[CourseID] = @CourseID
+		AND [IsDeleted] = 0
 	
 	SET @RowsAffected = @@ROWCOUNT
+	EXEC [Structure].[usp_GetCourseById] @CourseID = @CourseID;
 END
 GO
 
