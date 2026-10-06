@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using gLAMS.Application.DTOs.Interfaces;
 using gLAMS.Domain.Entities;
 
 namespace gLAMS.Application.DTOs.Folders
@@ -10,7 +11,7 @@ namespace gLAMS.Application.DTOs.Folders
     /// <summary>
     /// Data Transfer Object representing the incoming payload to update an existing Folder.
     /// </summary>
-    public class FolderUpdateDto
+    public class FolderUpdateDto : IMappableDto<Folder>
     {
         public Guid? ParentId { get; set; }
         public string Name { get; set; } = string.Empty;

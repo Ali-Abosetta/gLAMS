@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using gLAMS.Application.DTOs.Interfaces;
 using gLAMS.Domain.Entities;
 
 namespace gLAMS.Application.DTOs.Courses
@@ -10,7 +11,7 @@ namespace gLAMS.Application.DTOs.Courses
     /// <summary>
     /// Data Transfer Object representing the incoming payload to update an existing Course.
     /// </summary>
-    public class CourseUpdateDto
+    public class CourseUpdateDto : IMappableDto<Course>
     {
         public Guid FolderId { get; set; }
         public string Name { get; set; } = string.Empty;

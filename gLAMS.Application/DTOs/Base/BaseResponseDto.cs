@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace gLAMS.Application.DTOs
+namespace gLAMS.Application.DTOs.Base
 {
     /// <summary>
     /// Abstract base class for all response DTOs, containing offline-sync metadata (timestamps and tombstone flags).

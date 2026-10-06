@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace gLAMS.Application.DTOs
+namespace gLAMS.Application.DTOs.Base
 {
     /// <summary>
     /// Abstract base class for all creation DTOs, enforcing the inclusion of an explicit ID.
