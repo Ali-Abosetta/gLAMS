@@ -310,7 +310,7 @@ END
 GO
 
 -- get Lesson by id
-CREATE PROCEDURE [Structure].[usp_GetLesson]
+CREATE PROCEDURE [Structure].[usp_GetLessonById]
 	@LessonID UNIQUEIDENTIFIER
 AS
 BEGIN

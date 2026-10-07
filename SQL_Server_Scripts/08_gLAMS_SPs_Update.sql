@@ -57,8 +57,10 @@ BEGIN
 			[Title] = @Title,
 			[SortOrder] = @SortOrder
 	WHERE	[LessonID] = @LessonID
-	
+		AND [IsDeleted] = 0
+
 	SET @RowsAffected = @@ROWCOUNT
+	EXEC [Structure].[usp_GetLessonById] @LessonID = @LessonID;
 END
 GO
 
