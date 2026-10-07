@@ -21,6 +21,6 @@ namespace gLAMS.Application.Interfaces.Repositories
         /// </summary>
         /// <param name="courseId">The unique identifier of the course.</param>
         /// <returns>A Result containing the collection of course-level flashcards.</returns>
-        Task<Result<IEnumerable<FlashCard>>> GetCourseLevelFlashCardsAsync(Guid courseId);
+        Task<Result<IEnumerable<FlashCard>>> GetFlashCardsByCourseIdAsync(Guid courseId);
     }
 }

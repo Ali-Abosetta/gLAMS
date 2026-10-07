@@ -117,14 +117,30 @@ CREATE PROCEDURE [Content].[usp_UpdateFlashCard]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [Content].[FlashCards]	SET
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		UPDATE [Content].[FlashCards]	SET
 			[CourseID] = @CourseID,
 			[LessonID] = @LessonID,
 			[FrontContent] = @FrontContent,
 			[BackContent] = @BackContent
-	WHERE	[FlashCardID] = @FlashCardID
+		WHERE	[FlashCardID] = @FlashCardID
+			AND [IsDeleted] = 0
 	
 	SET @RowsAffected = @@ROWCOUNT
+	EXEC [Content].[usp_GetFlashCardById] @FlashCardID = @FlashCardID;
+	COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
 END
 GO
 

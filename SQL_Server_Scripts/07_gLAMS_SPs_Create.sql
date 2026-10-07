@@ -310,21 +310,36 @@ CREATE PROCEDURE [Content].[usp_AddFlashCard]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	INSERT INTO [Content].[FlashCards]
-	(
-		[FlashCardID],
-		[CourseID],
-		[LessonID],
-		[FrontContent],
-		[BackContent]
-	) VALUES
-	(
-		@FlashCardID,
-		@CourseID,
-		@LessonID,
-		@FrontContent,
-		@BackContent
-	)
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		INSERT INTO [Content].[FlashCards]
+		(
+			[FlashCardID],
+			[CourseID],
+			[LessonID],
+			[FrontContent],
+			[BackContent]
+		) VALUES
+		(
+			@FlashCardID,
+			@CourseID,
+			@LessonID,
+			@FrontContent,
+			@BackContent
+		)
+		EXEC [Content].[usp_GetFlashCardById] @FlashCardID = @FlashCardID;
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
 END
 GO
 

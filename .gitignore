@@ -429,3 +429,6 @@ FodyWeavers.xsd
 *.msp
 
 gLAMS.ConsoleSandbox/
+
+# Architecture Notes
+SortOrder_Architecture_Notes.md
