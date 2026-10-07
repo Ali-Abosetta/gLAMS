@@ -3,18 +3,24 @@ using gLAMS.Application.Interfaces.Repositories;
 using gLAMS.Domain.Entities;
 using gLAMS.Infrastructure.Repositories;
 using gLAMS.Shared.Responses;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace gLAMS.API.Controllers
 {
-    [Route("api/Lessons")]
-    [ApiController]
     /// <summary>
     /// Controller responsible for managing Lessons.
     /// </summary>
+    [Route("api/Lessons")]
+    [ApiController]
     public class LessonsController : ControllerBase
     {
         private readonly ILessonRepository _lessonRepository;
+        
         public LessonsController(ILessonRepository lessonRepository)
         {
             _lessonRepository = lessonRepository;
@@ -27,7 +33,7 @@ namespace gLAMS.API.Controllers
         [HttpGet("Course/{id:guid}", Name = "GetbyCourseId")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LessonResponseDto>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> GetLessonsByCourseId([FromRoute] Guid id)
         {
             Result<IEnumerable<Lesson>> result = await _lessonRepository.GetLessonsByCourseIdAsync(id);
@@ -36,9 +42,9 @@ namespace gLAMS.API.Controllers
             {
                 return StatusCode(500, result.ErrorMessage);
             }
-            else if (result.Data == null)
+            else if (result.Data == null || !result.Data.Any())
             {
-                return NotFound("No lessons found in this course");
+                return NotFound(Problem(detail: "No lessons found in this course.", title: "Resource Not Found"));
             }
             else
             {
@@ -54,20 +60,20 @@ namespace gLAMS.API.Controllers
         /// </summary>
         /// <param name="id">The GUID of the lesson.</param>
         [HttpGet("{id:guid}", Name = "GetLessonById")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LessonResponseDto>))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LessonResponseDto))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> GetById([FromRoute] Guid id)
         {
             Result<Lesson> result = await _lessonRepository.GetByIdAsync(id);
 
             if (!result.IsSuccess)
             {
-                return BadRequest(result.ErrorMessage);
+                return StatusCode(500, result.ErrorMessage);
             }
             else if (result.Data == null)
             {
-                return NotFound("No lesson found");
+                return NotFound(Problem(detail: "Lesson not found.", title: "Resource Not Found"));
             }
             else
             {
@@ -81,7 +87,7 @@ namespace gLAMS.API.Controllers
         [HttpGet(Name = "GetAllLessons")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<LessonResponseDto>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> GetAllLessons()
         {
             Result<IEnumerable<Lesson>> result = await _lessonRepository.GetAllAsync();
@@ -90,9 +96,9 @@ namespace gLAMS.API.Controllers
             {
                 return StatusCode(500, result.ErrorMessage);
             }
-            else if (result.Data == null)
+            else if (result.Data == null || !result.Data.Any())
             {
-                return NotFound(result.ErrorMessage);
+                return NotFound(Problem(detail: "No lessons found.", title: "Resource Not Found"));
             }
             else
             {
@@ -109,17 +115,17 @@ namespace gLAMS.API.Controllers
         /// <param name="lessonDto">The lesson creation payload.</param>
         [HttpPost(Name = "AddNewLesson")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(LessonResponseDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> AddLesson([FromBody] LessonCreateDto lessonDto)
         {
             if (lessonDto == null)
             {
-                return BadRequest("Invalid payload: the sent lesson is null");
+                return ValidationProblem(detail: "The sent lesson payload cannot be null.", title: "Invalid Payload");
             }
             else if (lessonDto.Id == Guid.Empty)
             {
-                return BadRequest("Invalid payload: The lesson id is empty");
+                return ValidationProblem(detail: "The lesson id cannot be empty.", title: "Invalid Identifier");
             }
 
             Lesson lesson = lessonDto.ToEntity();
@@ -131,7 +137,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null)
             {
-                return BadRequest("The database failed to insert the record.");
+                return StatusCode(500, "The database failed to insert the record.");
             }
             else
             {
@@ -151,18 +157,18 @@ namespace gLAMS.API.Controllers
         /// <param name="lessonDto">The updated lesson data.</param>
         [HttpPut("{id:guid}",  Name = "UpdateLesson")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(LessonResponseDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
         public async Task<IActionResult> UpdateLesson([FromRoute] Guid id, [FromBody] LessonUpdateDto lessonDto)
         {
             if (lessonDto == null)
             {
-                return BadRequest("Invalid payload: the sent lesson is null");
+                return ValidationProblem(detail: "The sent lesson payload cannot be null.", title: "Invalid Payload");
             }
             else if (id == Guid.Empty)
             {
-                return BadRequest("Invalid payload: The lesson id is empty");
+                return ValidationProblem(detail: "The lesson id cannot be empty.", title: "Invalid Identifier");
             }
 
             Lesson lesson = lessonDto.ToEntity();
@@ -176,7 +182,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null)
             {
-                return NotFound("Record not found.");
+                return NotFound(Problem(detail: "Record not found.", title: "Resource Not Found"));
             }
             else
             {
@@ -189,12 +195,11 @@ namespace gLAMS.API.Controllers
         /// </summary>
         /// <param name="id">The GUID of the lesson to delete.</param>
         [HttpDelete("{id:guid}", Name = "DeleteLesson")]
-        [ProducesResponseType(StatusCodes.Status204NoContent, Type = typeof(Result<bool>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
         public async Task<IActionResult> DeleteLesson([FromRoute] Guid id)
         {
-
             Result<bool> result = await _lessonRepository.DeleteAsync(id);
 
             if (!result.IsSuccess)
@@ -203,14 +208,12 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == false)
             {
-                return NotFound("ID not found or already deleted.");
+                return NotFound(Problem(detail: "ID not found or already deleted.", title: "Resource Not Found"));
             }
             else
             {
                 return NoContent();
             }
         }
-
     }
-
 }

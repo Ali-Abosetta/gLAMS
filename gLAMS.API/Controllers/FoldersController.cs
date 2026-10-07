@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace gLAMS.API.Controllers
 {
-    [Route("api/Folders")]
-    [ApiController]
     /// <summary>
     /// Controller responsible for managing Folder hierarchies.
     /// </summary>
+    [Route("api/Folders")]
+    [ApiController]
     public class FoldersController : ControllerBase
     {
         private readonly IFolderRepository _folderRepository;
@@ -24,13 +24,13 @@ namespace gLAMS.API.Controllers
             _folderRepository = folderRepository;
         }
 
-        [HttpGet(Name = "GetAllFolders")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         /// <summary>
         /// Retrieves all active folders in the system.
         /// </summary>
+        [HttpGet(Name = "GetAllFolders")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> GetAllFolders()
         {
             Result<IEnumerable<Folder>> result = await _folderRepository.GetAllAsync();
@@ -41,7 +41,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null || !result.Data.Any())
             {
-                return NotFound("No records found.");
+                return NotFound(Problem(detail: "No records found.", title: "Resource Not Found"));
             }
             else
             {
@@ -52,13 +52,13 @@ namespace gLAMS.API.Controllers
             }
         }
 
-        [HttpGet("Root", Name = "GetRootFolders")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         /// <summary>
         /// Retrieves all root folders (folders without a parent).
         /// </summary>
+        [HttpGet("Root", Name = "GetRootFolders")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> GetRootFolders()
         {
             Result<IEnumerable<Folder>> result = await _folderRepository.GetRootFoldersAsync();
@@ -69,7 +69,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null || !result.Data.Any())
             {
-                return NotFound("No records found.");
+                return NotFound(Problem(detail: "No records found.", title: "Resource Not Found"));
             }
             else
             {
@@ -80,14 +80,14 @@ namespace gLAMS.API.Controllers
             }
         }
 
-        [HttpGet("{id:guid}", Name = "GetFolderById")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FolderResponseDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         /// <summary>
         /// Retrieves a specific folder by its unique identifier.
         /// </summary>
         /// <param name="id">The GUID of the folder.</param>
+        [HttpGet("{id:guid}", Name = "GetFolderById")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FolderResponseDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> GetFolderById([FromRoute] Guid id)
         {
             Result<Folder> result = await _folderRepository.GetByIdAsync(id);
@@ -98,7 +98,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null)
             {
-                return NotFound("Record not found.");
+                return NotFound(Problem(detail: "Record not found.", title: "Resource Not Found"));
             }
             else
             {
@@ -106,14 +106,14 @@ namespace gLAMS.API.Controllers
             }
         }
 
-        [HttpGet("{parentId:guid}/SubFolders", Name = "GetSubFoldersByParentId")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         /// <summary>
         /// Retrieves all direct sub-folders for a given parent folder.
         /// </summary>
         /// <param name="parentId">The GUID of the parent folder.</param>
+        [HttpGet("{parentId:guid}/SubFolders", Name = "GetSubFoldersByParentId")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<FolderResponseDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> GetSubFoldersByParentId([FromRoute] Guid parentId)
         {
             Result<IEnumerable<Folder>> result = await _folderRepository.GetSubfoldersByParentIdAsync(parentId);
@@ -124,7 +124,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null || !result.Data.Any())
             {
-                return NotFound("No records found.");
+                return NotFound(Problem(detail: "No records found.", title: "Resource Not Found"));
             }
             else
             {
@@ -135,23 +135,23 @@ namespace gLAMS.API.Controllers
             }
         }
 
-        [HttpPost(Name = "AddNewFolder")]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(FolderResponseDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         /// <summary>
         /// Creates a new folder.
         /// </summary>
         /// <param name="newFolderDto">The folder creation payload.</param>
+        [HttpPost(Name = "AddNewFolder")]
+        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(FolderResponseDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> AddFolder([FromBody] FolderCreateDto newFolderDto)
         {
             if (newFolderDto == null)
             {
-                return BadRequest("Invalid payload: The sent folder is null.");
+                return ValidationProblem(detail: "Invalid payload: The sent folder is null.", title: "Invalid Payload");
             }
             else if (newFolderDto.Id == Guid.Empty)
             {
-                return BadRequest("Invalid payload: cannot have a null id.");
+                return ValidationProblem(detail: "Invalid payload: cannot have an empty id.", title: "Invalid Identifier");
             }
 
             Folder newFolder = newFolderDto.ToEntity();
@@ -163,7 +163,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null)
             {
-                return BadRequest("The database failed to insert the record.");
+                return StatusCode(500, "The database failed to insert the record.");
             }
             else
             {
@@ -176,26 +176,27 @@ namespace gLAMS.API.Controllers
             }
         }
 
-        [HttpPut("{id:guid}", Name = "UpdateFolder")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FolderResponseDto))]
-        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         /// <summary>
         /// Updates an existing folder's details.
         /// </summary>
         /// <param name="id">The GUID of the folder to update.</param>
         /// <param name="folderDto">The updated folder data.</param>
+        [HttpPut("{id:guid}", Name = "UpdateFolder")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(FolderResponseDto))]
+        [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ValidationProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> UpdateFolder([FromRoute] Guid id, [FromBody] FolderUpdateDto folderDto)
         {
             if (folderDto == null)
             {
-                return BadRequest("Invalid payload: the sent folder is null");
+                return ValidationProblem(detail: "Invalid payload: the sent folder is null.", title: "Invalid Payload");
             }
             else if (id == Guid.Empty)
             {
-                return BadRequest("Invalid payload: The folder id is empty");
+                return ValidationProblem(detail: "Invalid payload: The folder id is empty.", title: "Invalid Identifier");
             }
+            
             Folder folder = folderDto.ToEntity();
             folder.Id = id;
 
@@ -207,7 +208,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null)
             {
-                return NotFound("Record not found.");
+                return NotFound(Problem(detail: "Record not found.", title: "Resource Not Found"));
             }
             else
             {
@@ -215,14 +216,14 @@ namespace gLAMS.API.Controllers
             }
         }
 
-        [HttpDelete("{id:guid}", Name = "DeleteFolder")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(string))]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         /// <summary>
         /// Soft deletes a folder by its unique identifier.
         /// </summary>
         /// <param name="id">The GUID of the folder to delete.</param>
+        [HttpDelete("{id:guid}", Name = "DeleteFolder")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ProblemDetails))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(string))]
         public async Task<IActionResult> DeleteFolder([FromRoute] Guid id)
         {
             Result<bool> result = await _folderRepository.DeleteAsync(id);
@@ -233,7 +234,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == false)
             {
-                return NotFound("ID not found or already deleted.");
+                return NotFound(Problem(detail: "ID not found or already deleted.", title: "Resource Not Found"));
             }
             else
             {
