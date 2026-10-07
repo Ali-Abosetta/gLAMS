@@ -11,14 +11,28 @@ CREATE PROCEDURE [Structure].[usp_UpdateFolder]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [Structure].[Folders]	SET
-			[ParentID] = @ParentID,
-			[Name] = @Name
-	WHERE	[FolderID] = @FolderID
-		AND [IsDeleted] = 0
+	SET XACT_ABORT ON;
 
-	SET @RowsAffected = @@ROWCOUNT
-	EXEC [Structure].[usp_GetFolderById] @FolderID = @FolderID;
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		UPDATE [Structure].[Folders]	SET
+				[ParentID] = @ParentID,
+				[Name] = @Name
+		WHERE	[FolderID] = @FolderID
+			AND [IsDeleted] = 0
+
+		SET @RowsAffected = @@ROWCOUNT
+		EXEC [Structure].[usp_GetFolderById] @FolderID = @FolderID;
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRANSACTION;
+		END 
+		;THROW;
+	END CATCH
 END
 GO
 
@@ -31,14 +45,28 @@ CREATE PROCEDURE [Structure].[usp_UpdateCourse]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [Structure].[Courses]	SET
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		UPDATE [Structure].[Courses]	SET
 			[FolderID] = @FolderID,
 			[Name] = @Name
-	WHERE	[CourseID] = @CourseID
-		AND [IsDeleted] = 0
+		WHERE	[CourseID] = @CourseID
+			AND [IsDeleted] = 0
 	
-	SET @RowsAffected = @@ROWCOUNT
-	EXEC [Structure].[usp_GetCourseById] @CourseID = @CourseID;
+		SET @RowsAffected = @@ROWCOUNT
+		EXEC [Structure].[usp_GetCourseById] @CourseID = @CourseID;
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRANSACTION;
+		END 
+		;THROW;
+	END CATCH
 END
 GO
 
@@ -52,15 +80,29 @@ CREATE PROCEDURE [Structure].[usp_UpdateLesson]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [Structure].[Lessons]	SET
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		UPDATE [Structure].[Lessons]	SET
 			[CourseID] = @CourseID,
 			[Title] = @Title,
 			[SortOrder] = @SortOrder
-	WHERE	[LessonID] = @LessonID
-		AND [IsDeleted] = 0
+		WHERE	[LessonID] = @LessonID
+			AND [IsDeleted] = 0
 
-	SET @RowsAffected = @@ROWCOUNT
-	EXEC [Structure].[usp_GetLessonById] @LessonID = @LessonID;
+		SET @RowsAffected = @@ROWCOUNT
+		EXEC [Structure].[usp_GetLessonById] @LessonID = @LessonID;
+		COMMIT TRANSACTION;
+	END TRY
+
+		BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRANSACTION;
+		END 
+		;THROW;
+	END CATCH
 END
 GO
 

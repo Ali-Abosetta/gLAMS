@@ -67,7 +67,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null)
             {
-                return NotFound(result.ErrorMessage);
+                return NotFound("No lesson found");
             }
             else
             {

@@ -13,19 +13,32 @@ CREATE PROCEDURE [Structure].[usp_AddFolder]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	INSERT INTO [Structure].[Folders]
-	(
-		[FolderID],
-		[ParentID],
-		[Name]
-	) VALUES
-	(
-		@FolderID,
-		@ParentID,
-		@Name
-	)
+	SET XACT_ABORT ON;
+	BEGIN TRY
+		BEGIN TRANSACTION;
 
-	EXEC [Structure].[usp_GetFolderById] @FolderID = @FolderID;
+		INSERT INTO [Structure].[Folders]
+		(
+			[FolderID],
+			[ParentID],
+			[Name]
+		) VALUES
+		(
+			@FolderID,
+			@ParentID,
+			@Name
+		)
+
+		EXEC [Structure].[usp_GetFolderById] @FolderID = @FolderID;
+		COMMIT TRANSACTION
+	END TRY
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
 END
 GO
 
@@ -38,18 +51,32 @@ CREATE PROCEDURE [Structure].[usp_AddCourse]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	INSERT INTO [Structure].[Courses]
-	(
-		[CourseID],
-		[FolderID],
-		[Name]
-	) VALUES
-	(
-		@CourseID,
-		@FolderID,
-		@Name
-	)
-	EXEC [Structure].[usp_GetCourseById] @CourseID = @CourseID;
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+
+		BEGIN TRANSACTION;
+		INSERT INTO [Structure].[Courses]
+		(
+			[CourseID],
+			[FolderID],
+			[Name]
+		) VALUES
+		(
+			@CourseID,
+			@FolderID,
+			@Name
+		)
+		EXEC [Structure].[usp_GetCourseById] @CourseID = @CourseID;
+		COMMIT TRANSACTION;
+	END TRY
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
 END
 GO
 
@@ -62,28 +89,42 @@ CREATE PROCEDURE [Structure].[usp_AddLesson]
 AS
 BEGIN
 	SET NOCOUNT ON;
+	SET XACT_ABORT ON;
 
-	DECLARE @NextSort INT;
+	BEGIN TRY
+		
+		BEGIN TRANSACTION;
+		DECLARE @NextSort INT;
 
--- Use UPDLOCK and HOLDLOCK to serialize concurrent inserts
-	SELECT @NextSort = ISNULL(MAX(SortOrder), 0) + 1 
-	FROM [Structure].[Lessons] WITH (UPDLOCK, HOLDLOCK)
-	WHERE CourseID = @CourseID;
+		SELECT @NextSort = ISNULL(MAX(SortOrder), 0) + 1 
+		FROM [Structure].[Lessons] WITH (UPDLOCK, HOLDLOCK)
+		WHERE CourseID = @CourseID;
 
-	INSERT INTO [Structure].[Lessons]
-	(
-		[LessonID],
-		[CourseID],
-		[Title],
-		[SortOrder]
-	) VALUES
-	(
-		@LessonID,
-		@CourseID,
-		@Title,
-		@NextSort
-	)
-	EXEC [Structure].[usp_GetLesson] @LessonID = @LessonID;
+		INSERT INTO [Structure].[Lessons]
+		(
+			[LessonID],
+			[CourseID],
+			[Title],
+			[SortOrder]
+		) VALUES
+		(
+			@LessonID,
+			@CourseID,
+			@Title,
+			@NextSort
+		)
+		EXEC [Structure].[usp_GetLessonById] @LessonID = @LessonID;
+		COMMIT TRANSACTION;
+
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN 
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
 END
 GO
 

@@ -32,12 +32,12 @@ namespace gLAMS.Application.DTOs.Courses
         {
             return new Course
             {
-                Id = Id,
-                FolderId = FolderId,
-                Name = Name,
-                CreatedAt = CreatedAt,
-                UpdatedAt = UpdatedAt,
-                IsDeleted = IsDeleted
+                Id = this.Id,
+                FolderId = this.FolderId,
+                Name = this.Name,
+                CreatedAt = this.CreatedAt,
+                UpdatedAt = this.UpdatedAt,
+                IsDeleted = this.IsDeleted
             };
         }
     }
