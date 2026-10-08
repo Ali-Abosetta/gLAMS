@@ -155,14 +155,31 @@ CREATE PROCEDURE [Content].[usp_UpdateNote]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [Content].[Notes]	SET
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		UPDATE [Content].[Notes]	SET
 			[CourseID] = @CourseID,
 			[LessonID] = @LessonID,
 			[Title] = @Title,
 			[NoteText] = @NoteText
-	WHERE	[NoteID] = @NoteID
+		WHERE	[NoteID] = @NoteID
+			AND [IsDeleted] = 0
+
+		SET @RowsAffected = @@ROWCOUNT
+		EXEC [Content].[usp_GetNoteById] @NoteId = @NoteID;
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN 
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
 	
-	SET @RowsAffected = @@ROWCOUNT
 END
 GO
 

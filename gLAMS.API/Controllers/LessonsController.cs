@@ -182,7 +182,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == null)
             {
-                return NotFound(Problem(detail: "Record not found.", title: "Resource Not Found"));
+                return Problem(detail: "Record not found.", statusCode: 404, title: "Resource Not Found");
             }
             else
             {
@@ -208,7 +208,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == false)
             {
-                return NotFound(Problem(detail: "ID not found or already deleted.", title: "Resource Not Found"));
+                return Problem(detail: "ID not found or already deleted.", statusCode: 404, title: "Resource Not Found");
             }
             else
             {

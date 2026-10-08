@@ -215,7 +215,7 @@ namespace gLAMS.API.Controllers
             }
             else if (result.Data == false)
             {
-                return NotFound(Problem(detail: "ID not found or already deleted.", title: "Resource Not Found"));
+                return Problem(detail: "ID not found or already deleted.", statusCode: 404, title: "Resource Not Found");
             }
             
             return NoContent();

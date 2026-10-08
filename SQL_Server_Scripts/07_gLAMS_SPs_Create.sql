@@ -353,22 +353,40 @@ CREATE PROCEDURE [Content].[usp_AddNote]
 	@NoteText NVARCHAR(MAX)
 AS
 BEGIN
+
 	SET NOCOUNT ON;
-	INSERT INTO [Content].[Notes]
-	(
-		[NoteID],
-		[CourseID],
-		[LessonID],
-		[Title],
-		[NoteText]
-	) VALUES
-	(
-		@NoteID,
-		@CourseID,
-		@LessonID,
-		@Title,
-		@NoteText
-	)
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		INSERT INTO [Content].[Notes]
+		(
+			[NoteID],
+			[CourseID],
+			[LessonID],
+			[Title],
+			[NoteText]
+		) VALUES
+		(
+			@NoteID,
+			@CourseID,
+			@LessonID,
+			@Title,
+			@NoteText
+		)
+
+		EXEC [Content].[usp_GetNoteById] @NoteID = @NoteID;
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN 
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
+
 END
 GO
 

@@ -476,6 +476,73 @@ BEGIN
 END
 GO
 
+-- get note by id
+CREATE PROCEDURE [Content].[usp_GetNoteById]
+
+	@NoteID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT
+		[NoteID],
+		[CourseID],
+		[LessonID],
+		[Title],
+		[NoteText],
+		[CreatedAt],
+		[UpdatedAt],
+		[IsDeleted]
+	FROM [Content].[Notes]
+	WHERE	[NoteID] = @NoteID
+		AND [IsDeleted] = 0;
+END
+GO
+
+-- get notes by lesson id 
+CREATE PROCEDURE [Content].[usp_GetNotesByLessonID]
+	@LessonID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT
+		[NoteID],
+		[CourseID],
+		[LessonID],
+		[Title],
+		[NoteText],
+		[CreatedAt],
+		[UpdatedAt],
+		[IsDeleted]
+	FROM [Content].[Notes]
+	WHERE	[LessonID] = @LessonID
+		AND [IsDeleted] = 0;
+END
+GO
+
+-- get notes by coures id 
+CREATE PROCEDURE [Content].[usp_GetNotesByCourseID]
+	@CourseID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+
+	SELECT
+		[NoteID],
+		[CourseID],
+		[LessonID],
+		[Title],
+		[NoteText],
+		[CreatedAt],
+		[UpdatedAt],
+		[IsDeleted]
+	FROM [Content].[Notes]
+	WHERE	[CourseID] = @CourseID
+		AND [IsDeleted] = 0;
+END
+GO
+
 -- get refrences
 CREATE PROCEDURE [Content].[usp_GetReferences]
 	@LastSyncTime DATETIME2 = NULL
