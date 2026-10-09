@@ -543,6 +543,71 @@ BEGIN
 END
 GO
 
+-- get refrence by ID
+CREATE PROCEDURE [Content].[usp_GetReferenceById]
+	@ReferenceID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT 
+		[ReferenceID],
+		[CourseID],
+		[LessonID],
+		[Title],
+		[ReferenceType],
+		[ContentValue],
+		[CreatedAt],
+		[UpdatedAt],
+		[IsDeleted]
+	FROM [Content].[References]
+	WHERE [ReferenceID] = @ReferenceID;
+END
+GO
+
+-- get refrences by course ID
+CREATE PROCEDURE [Content].[usp_GetReferencesByCourseID]
+	@CourseID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT 
+		[ReferenceID],
+		[CourseID],
+		[LessonID],
+		[Title],
+		[ReferenceType],
+		[ContentValue],
+		[CreatedAt],
+		[UpdatedAt],
+		[IsDeleted]
+	FROM [Content].[References]
+	WHERE [CourseID] = @CourseID
+	  AND [IsDeleted] = 0;
+END
+GO
+
+-- get refrences by lesson ID
+CREATE PROCEDURE [Content].[usp_GetReferencesByLessonID]
+	@LessonID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+	SELECT 
+		[ReferenceID],
+		[CourseID],
+		[LessonID],
+		[Title],
+		[ReferenceType],
+		[ContentValue],
+		[CreatedAt],
+		[UpdatedAt],
+		[IsDeleted]
+	FROM [Content].[References]
+	WHERE [LessonID] = @LessonID
+	  AND [IsDeleted] = 0;
+END
+GO
+
 -- get refrences
 CREATE PROCEDURE [Content].[usp_GetReferences]
 	@LastSyncTime DATETIME2 = NULL

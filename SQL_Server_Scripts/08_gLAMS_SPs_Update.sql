@@ -195,15 +195,33 @@ CREATE PROCEDURE [Content].[usp_UpdateReference]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	UPDATE [Content].[References]	SET
-			[CourseID] = @CourseID,
-			[LessonID] = @LessonID,
-			[Title] = @Title,
-			[ReferenceType] = @ReferenceType,
-			[ContentValue] = @ContentValue
-	WHERE	[ReferenceID] = @ReferenceID
-	
-	SET @RowsAffected = @@ROWCOUNT
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+
+		UPDATE [Content].[References]	SET
+				[CourseID] = @CourseID,
+				[LessonID] = @LessonID,
+				[Title] = @Title,
+				[ReferenceType] = @ReferenceType,
+				[ContentValue] = @ContentValue
+		WHERE	[ReferenceID] = @ReferenceID
+		
+		SET @RowsAffected = @@ROWCOUNT
+
+		EXEC [Content].[usp_GetReferenceById] @ReferenceID = @ReferenceID;
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN 
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
+
 END
 GO
 

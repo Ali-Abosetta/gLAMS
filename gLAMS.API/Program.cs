@@ -31,7 +31,7 @@ builder.Services.AddScoped<ICourseRepository, CourseRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IFlashCardRepository, FlashCardRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
-
+builder.Services.AddScoped<IReferenceRepository, ReferenceRepository>();
 
 
 var app = builder.Build();

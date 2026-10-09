@@ -402,23 +402,40 @@ CREATE PROCEDURE [Content].[usp_AddReference]
 AS
 BEGIN
 	SET NOCOUNT ON;
-	INSERT INTO [Content].[References]
-	(
-		[ReferenceID],
-		[CourseID],
-		[LessonID],
-		[Title],
-		[ReferenceType],
-		[ContentValue]
-	) VALUES
-	(
-		@ReferenceID,
-		@CourseID,
-		@LessonID,
-		@Title,
-		@ReferenceType,
-		@ContentValue
-	)
+	SET XACT_ABORT ON;
+
+	BEGIN TRY
+		BEGIN TRANSACTION;
+		INSERT INTO [Content].[References]
+		(
+			[ReferenceID],
+			[CourseID],
+			[LessonID],
+			[Title],
+			[ReferenceType],
+			[ContentValue]
+		) VALUES
+		(
+			@ReferenceID,
+			@CourseID,
+			@LessonID,
+			@Title,
+			@ReferenceType,
+			@ContentValue
+		)
+
+		EXEC [Content].[usp_GetReferenceById] @ReferenceID = @ReferenceID;
+		COMMIT TRANSACTION;
+	END TRY
+
+	BEGIN CATCH
+		IF (@@TRANCOUNT > 0)
+		BEGIN 
+			ROLLBACK TRANSACTION;
+		END
+		;THROW;
+	END CATCH
+
 END
 GO
 
