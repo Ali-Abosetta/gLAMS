@@ -297,10 +297,9 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	SET XACT_ABORT ON;
-
 	BEGIN TRY
 		BEGIN TRANSACTION;
-
+		-- 1. Update the base question
 		EXEC [Content].[usp_UpdateQuestion]
 			@QuestionID = @QuestionID,
 			@CourseID = @CourseID,
@@ -308,13 +307,35 @@ BEGIN
 			@QuestionType = 1, -- Hardcode Type 1 (MCQ)
 			@QuestionText = @QuestionText,
 			@RowsAffected = @RowsAffected OUTPUT;
-
-		-- If base update succeeded, replace the options
+		-- 2. If question exists and was updated, process the options
 		IF (@RowsAffected > 0)
 		BEGIN
-			DELETE FROM [Content].[McqOptions]
-			WHERE QuestionID = @QuestionID;
+			-- Parse the JSON into #json
+			SELECT 
+				OptionID,
+				AnswerText,
+				IsCorrect,
+				SortOrder
+			INTO #json
+			FROM OPENJSON(@OptionsJson)
+			WITH (
+				OptionID UNIQUEIDENTIFIER '$.Id',
+				AnswerText NVARCHAR(500) '$.AnswerText',
+				IsCorrect BIT '$.IsCorrect',
+				SortOrder INT '$.SortOrder'
+			);
+			-- 3. Update existing options in place (OptionID is preserved!)
+			UPDATE opt
+			SET 
+				opt.AnswerText = j.AnswerText,
+				opt.IsCorrect = j.IsCorrect,
+				opt.SortOrder = j.SortOrder
+			FROM [Content].[McqOptions] opt
+			JOIN #json j ON opt.OptionID = j.OptionID
+			WHERE opt.QuestionID = @QuestionID
+			  AND opt.IsDeleted = 0;
 
+			-- 4. Insert any newly added options (not found in table)
 			INSERT INTO [Content].[McqOptions]
 			(
 				[OptionID],
@@ -324,23 +345,36 @@ BEGIN
 				[SortOrder]
 			)
 			SELECT 
-				OptionID,
-				@QuestionID, 
-				AnswerText,
-				IsCorrect,
-				ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) 
-			FROM OPENJSON(@OptionsJson)
-			WITH (
-				OptionID UNIQUEIDENTIFIER '$.OptionID',
-				AnswerText NVARCHAR(500) '$.AnswerText',
-				IsCorrect BIT '$.IsCorrect'
+				j.OptionID,
+				@QuestionID,
+				j.AnswerText,
+				j.IsCorrect,
+				j.SortOrder
+			FROM #json j
+			WHERE NOT EXISTS (
+				SELECT 1 
+				FROM [Content].[McqOptions] opt
+				WHERE opt.OptionID = j.OptionID
 			);
 
+			-- 5. Soft-delete options that were omitted from #json
+			UPDATE opt
+			SET opt.IsDeleted = 1
+			FROM [Content].[McqOptions] opt
+			WHERE opt.QuestionID = @QuestionID
+			  AND opt.IsDeleted = 0
+			  AND NOT EXISTS (
+				  SELECT 1 
+				  FROM #json j
+				  WHERE j.OptionID = opt.OptionID
+			  );
+			-- 6. Return the updated question with its choices
+			EXEC [Content].[usp_GetMcqQuestionById] @QuestionID = @QuestionID;
 			COMMIT TRANSACTION;
 		END
 		ELSE
 		BEGIN
-			-- Base question not found
+			-- Base question not found or already deleted
 			ROLLBACK TRANSACTION;
 			RETURN;
 		END
@@ -352,7 +386,6 @@ BEGIN
 		END
 		;THROW;
 	END CATCH
-
 END
 GO
 
@@ -411,6 +444,7 @@ BEGIN
 			RETURN;
 		END
 		
+		EXEC [Content].[usp_GetEssayQuestionById] @QuestionID = @QuestionID;
 		COMMIT TRANSACTION;
 	END TRY
 	BEGIN CATCH

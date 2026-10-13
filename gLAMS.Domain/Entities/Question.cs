@@ -33,7 +33,7 @@ namespace gLAMS.Domain.Entities
         /// Gets or sets the actual text or prompt for the question.
         /// </summary>
         [Required(ErrorMessage = "Question's text is required.")]
-        public string Text { get; set; }
+        public string QuestionText { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Question"/> class.
@@ -41,17 +41,17 @@ namespace gLAMS.Domain.Entities
         /// </summary>
         protected Question()
         {
-            Text = string.Empty;
+            QuestionText = string.Empty;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Question"/> class.
         /// </summary>
-        protected Question(Guid courseId, QuestionType type, string text, Guid? lessonId = null)
+        protected Question(Guid courseId, QuestionType type, string QuestionText, Guid? lessonId = null)
         {
             CourseId = courseId;
             Type = type;
-            Text = text;
+            this.QuestionText = QuestionText;
             LessonId = lessonId;
         }
     }

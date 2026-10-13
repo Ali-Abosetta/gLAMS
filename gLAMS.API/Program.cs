@@ -23,7 +23,7 @@ if (string.IsNullOrWhiteSpace(connectionString))
 builder.Services.AddSingleton<IAppLogger, WindowsEventLogger>();
 
 builder.Services.AddSingleton<ISqlConnectionFactory>(
-    provider => new SqlConnectionFactory(connectionString!)
+    provider => new SqlConnectionFactory(connectionString)
 );
 
 builder.Services.AddScoped<IFolderRepository, FolderRepository>();
@@ -32,6 +32,9 @@ builder.Services.AddScoped<ILessonRepository, LessonRepository>();
 builder.Services.AddScoped<IFlashCardRepository, FlashCardRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<IReferenceRepository, ReferenceRepository>();
+builder.Services.AddScoped<IMcqQuestionRepository, McqQuestionRepository>();
+builder.Services.AddScoped<IEssayQuestionRepository, EssayQuestionRepository>();
+
 
 
 var app = builder.Build();

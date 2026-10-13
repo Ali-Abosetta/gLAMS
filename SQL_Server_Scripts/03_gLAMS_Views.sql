@@ -1,36 +1,51 @@
 USE [gLAMS]
 GO
 
-CREATE VIEW [Content].[vw_ActiveMcqQuestions]
+CREATE VIEW [Content].[vw_McqQuestions]
 AS
 SELECT 
-	q.[QuestionID],
-	q.[CourseID],
-	q.[LessonID],
-	q.[QuestionText],
-	q.[UpdatedAt] AS QuestionUpdatedAt,
-	o.[OptionID],
-	o.[AnswerText],
-	o.[IsCorrect],
-	o.[SortOrder]
+    q.[QuestionID],
+    q.[CourseID],
+    q.[LessonID],
+    q.[QuestionText],
+    q.[CreatedAt],
+    q.[UpdatedAt],
+    q.[IsDeleted],
+    (
+        SELECT 
+            [OptionID] AS [Id], 
+            [AnswerText], 
+            [IsCorrect], 
+            [SortOrder],
+            [CreatedAt],
+            [UpdatedAt],
+            [IsDeleted]
+        FROM [Content].[McqOptions] o
+        WHERE o.[QuestionID] = q.[QuestionID] 
+          AND o.[IsDeleted] = 0
+        ORDER BY o.[SortOrder]
+        FOR JSON PATH
+    ) AS [OptionsJson]
 FROM [Content].[Questions] q
-INNER JOIN [Content].[McqOptions] o ON q.[QuestionID] = o.[QuestionID]
 WHERE q.[QuestionType] = 1 
-  AND q.[IsDeleted] = 0 
-  AND o.[IsDeleted] = 0;
+  AND q.[IsDeleted] = 0;
 GO
 
-CREATE VIEW [Content].[vw_ActiveEssayQuestions]
+
+CREATE VIEW [Content].[vw_EssayQuestions]
 AS
 SELECT 
-	q.[QuestionID],
-	q.[CourseID],
-	q.[LessonID],
-	q.[QuestionText],
-	q.[UpdatedAt],
-	ea.[ModelAnswer]
+    q.[QuestionID],
+    q.[CourseID],
+    q.[LessonID],
+    q.[QuestionType],
+    q.[QuestionText],
+    q.[CreatedAt],
+    q.[UpdatedAt],
+    q.[IsDeleted],
+    ea.[ModelAnswer]
 FROM [Content].[Questions] q
-INNER JOIN [Content].[EssayAnswers] ea ON q.[QuestionID] = ea.[QuestionID]
+JOIN [Content].[EssayAnswers] ea ON q.[QuestionID] = ea.[QuestionID]
 WHERE q.[QuestionType] = 2 
   AND q.[IsDeleted] = 0 
   AND ea.[IsDeleted] = 0;

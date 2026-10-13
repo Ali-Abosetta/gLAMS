@@ -22,7 +22,7 @@ namespace gLAMS.Domain.Entities
         /// </summary>
         [Required(ErrorMessage = "Option's text (answer) is required.")]
         [MaxLength(500, ErrorMessage = "Option's text (answer) cannot exceed 500 characters.")]
-        public string Text { get; set; }
+        public string AnswerText { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this option is the correct answer.
@@ -41,7 +41,7 @@ namespace gLAMS.Domain.Entities
         /// </summary>
         public McqOption()
         {
-            Text = string.Empty;
+            AnswerText = string.Empty;
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace gLAMS.Domain.Entities
         public McqOption(Guid questionId, string text, bool isCorrect, int sortOrder)
         {
             QuestionId = questionId;
-            Text = text;
+            AnswerText = text;
             IsCorrect = isCorrect;
             SortOrder = sortOrder;
         }

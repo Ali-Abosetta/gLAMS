@@ -686,6 +686,40 @@ BEGIN
 END
 GO
 
+-- get all mcq questions
+CREATE PROCEDURE [Content].[usp_GetMcqQuestions]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        [QuestionID], [CourseID], [LessonID], [QuestionText], 
+        [CreatedAt], [UpdatedAt], [IsDeleted], [OptionsJson]
+    FROM [Content].[vw_McqQuestions];
+END
+GO
+
+-- get mcq question by question id
+CREATE PROCEDURE [Content].[usp_GetMcqQuestionById]
+    @QuestionID UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        [QuestionID],
+		[CourseID], 
+		[LessonID], 
+		[QuestionText], 
+        [CreatedAt], 
+		[UpdatedAt], 
+		[IsDeleted], 
+		[OptionsJson]
+    FROM [Content].[vw_McqQuestions]
+    WHERE [QuestionID] = @QuestionID;
+END
+GO
+
 -- get mcq options
 CREATE PROCEDURE [Content].[usp_GetMcqOptions]
 	@LastSyncTime DATETIME2 = NULL
@@ -724,6 +758,94 @@ BEGIN
 END
 GO
 
+-- get mcq questions by course id
+CREATE PROCEDURE [Content].[usp_GetMcqQuestionsByCourseID]
+    @CourseID UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        [QuestionID], [CourseID], [LessonID], [QuestionText], 
+        [CreatedAt], [UpdatedAt], [IsDeleted], [OptionsJson]
+    FROM [Content].[vw_McqQuestions]
+    WHERE [CourseID] = @CourseID;
+END
+GO
+
+-- get mcq questions by lesson id
+CREATE PROCEDURE [Content].[usp_GetMcqQuestionsByLessonID]
+    @LessonID UNIQUEIDENTIFIER
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        [QuestionID], [CourseID], [LessonID], [QuestionText], 
+        [CreatedAt], [UpdatedAt], [IsDeleted], [OptionsJson]
+    FROM [Content].[vw_McqQuestions]
+    WHERE [LessonID] = @LessonID;
+END
+GO
+
+-- get all essay questions
+CREATE PROCEDURE [Content].[usp_GetEssayQuestions]
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT 
+        [QuestionID], [CourseID], [LessonID], [QuestionType], [QuestionText], 
+        [ModelAnswer], [CreatedAt], [UpdatedAt], [IsDeleted]
+    FROM [Content].[vw_EssayQuestions];
+END
+GO
+
+-- get essay question by id
+CREATE PROCEDURE [Content].[usp_GetEssayQuestionById]
+	@QuestionID UNIQUEIDENTIFIER
+AS
+BEGIN 
+	SET NOCOUNT ON;
+
+	SELECT 
+        [QuestionID], [CourseID], [LessonID], [QuestionType], [QuestionText], 
+        [ModelAnswer], [CreatedAt], [UpdatedAt], [IsDeleted]
+    FROM [Content].[vw_EssayQuestions]
+	WHERE [QuestionID] = @QuestionID;
+END
+GO
+
+-- get essay questions by course id
+CREATE PROCEDURE [Content].[usp_GetEssayQuestionsByCourseID]
+	@CourseID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+	
+	SELECT 
+        [QuestionID], [CourseID], [LessonID], [QuestionType], [QuestionText], 
+        [ModelAnswer], [CreatedAt], [UpdatedAt], [IsDeleted]
+    FROM [Content].[vw_EssayQuestions]
+	WHERE [CourseID] = @CourseID;
+END
+GO
+
+-- get essay questions by lesson id
+CREATE PROCEDURE [Content].[usp_GetEssayQuestionsByLessonID]
+	@LessonID UNIQUEIDENTIFIER
+AS
+BEGIN
+	SET NOCOUNT ON;
+	
+	SELECT 
+        [QuestionID], [CourseID], [LessonID], [QuestionType], [QuestionText], 
+        [ModelAnswer], [CreatedAt], [UpdatedAt], [IsDeleted]
+    FROM [Content].[vw_EssayQuestions]
+	WHERE [LessonID] = @LessonID;
+END
+GO
+
 -- get essay answers
 CREATE PROCEDURE [Content].[usp_GetEssayAnswers]
 	@LastSyncTime DATETIME2 = NULL
@@ -753,44 +875,5 @@ BEGIN
 		FROM [Content].[EssayAnswers]
 		WHERE [UpdatedAt] > @LastSyncTime;
 	END
-END
-GO
-
-CREATE PROCEDURE [Content].[usp_GetActiveMcqsByCourse]
-	@CourseID UNIQUEIDENTIFIER
-AS
-BEGIN
-	SET NOCOUNT ON;
-	
-	SELECT 
-		[QuestionID],
-		[CourseID],
-		[LessonID],
-		[QuestionText],
-		[QuestionUpdatedAt],
-		[OptionID],
-		[AnswerText],
-		[IsCorrect],
-		[SortOrder]
-	FROM [Content].[vw_ActiveMcqQuestions]
-	WHERE [CourseID] = @CourseID;
-END
-GO
-
-CREATE PROCEDURE [Content].[usp_GetActiveEssaysByCourse]
-	@CourseID UNIQUEIDENTIFIER
-AS
-BEGIN
-	SET NOCOUNT ON;
-	
-	SELECT 
-		[QuestionID],
-		[CourseID],
-		[LessonID],
-		[QuestionText],
-		[UpdatedAt],
-		[ModelAnswer]
-	FROM [Content].[vw_ActiveEssayQuestions]
-	WHERE [CourseID] = @CourseID;
 END
 GO

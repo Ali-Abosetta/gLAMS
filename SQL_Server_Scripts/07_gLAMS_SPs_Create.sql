@@ -238,11 +238,12 @@ BEGIN
 			ROW_NUMBER() OVER (ORDER BY (SELECT NULL)) -- Generates 1, 2, 3, 4 automatically
 		FROM OPENJSON(@OptionsJSON)
 		WITH (
-			OptionID UNIQUEIDENTIFIER '$.OptionID',
+			OptionID UNIQUEIDENTIFIER '$.Id',
 			AnswerText NVARCHAR(500) '$.AnswerText',
 			IsCorrect BIT '$.IsCorrect'
 			);
 
+		EXEC [Content].[usp_GetMcqQuestionById] @QuestionID = @QuestionID;
 		COMMIT TRANSACTION;
 	END TRY
 	BEGIN CATCH
@@ -285,8 +286,9 @@ BEGIN
 		(
 			@QuestionID,
 			@ModelAnswer
-		)
+		);
 
+		EXEC [Content].[usp_GetEssayQuestionById] @QuestionID = @QuestionID;
 		COMMIT TRANSACTION;
 	END TRY
 	BEGIN CATCH
